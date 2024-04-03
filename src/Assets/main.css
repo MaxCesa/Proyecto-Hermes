@@ -10,6 +10,19 @@
  */
 
 /*#region fonts*/
+
+:root {
+  --yellow: #f8ef02;
+  --cyan: #00ffd2;
+  --red: #ff003c;
+  --blue: #136377;
+  --green: #446d44;
+  --purple: purple;
+  --black: #000;
+  --white: #fff;
+  --dark: #333;
+}
+
 @font-face {
   font-family: BlenderProBook;
   font-style: normal;
