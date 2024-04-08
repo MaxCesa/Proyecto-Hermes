@@ -1,12 +1,13 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import Header from "../Components/Header.tsx";
 
 type Props = {};
 
 function Layout({}: Props) {
   return (
     <div>
-      <h1>Header</h1>
+      <Header />
       <Outlet />
     </div>
   );
