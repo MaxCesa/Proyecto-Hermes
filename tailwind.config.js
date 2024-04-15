@@ -15,6 +15,7 @@ module.exports = {
         CPblack: "#000",
         CPwhite: "#fff",
         CPdark: "#333",
+        CPdarkblue: "#0b1628",
       },
       fontFamily: {
         cyberpunk: "Cyberpunk",
