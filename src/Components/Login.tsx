@@ -2,20 +2,29 @@ import React, { useState } from "react";
 import Input from "./Input.tsx";
 import "../Assets/main.css";
 import { BE_signIn, BE_signUp } from "../Backend/Queries.ts";
+import { useNavigate } from "react-router-dom";
+
 const Login = () => {
   const [login, setLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [referenceKey, setReferenceKey] = useState("");
+  const [username, setUsername] = useState("");
+  const routeTo = useNavigate();
+  const reset = () => {
+    setEmail("");
+    setPassword("");
+    setPasswordConfirm("");
+    setUsername("");
+  };
 
   const handleSignup = () => {
-    const data = { email, password, passwordConfirm };
-    BE_signUp(data);
+    const data = { email, username, password, passwordConfirm };
+    BE_signUp(data, reset, routeTo);
   };
   const handleSignin = () => {
     const data = { email, password };
-    BE_signIn(data);
+    BE_signIn(data, reset, routeTo);
   };
 
   return (
@@ -30,6 +39,15 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {!login && (
+          <Input
+            name="nombre de usuario"
+            type="text"
+            className="flex-1 bg-transparent px-3 py-1 border-2 border-CPred rounded-full text-CPwhite font-oxanium"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        )}
         <Input
           name="contraseña"
           type="password"
