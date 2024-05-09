@@ -6,7 +6,9 @@ import { auth, db } from "./Firebase.ts";
 import { toastErr } from "../utils/toast.ts";
 import catchErr from "../utils/catchErr.ts";
 import { NavigateFunction } from "react-router-dom";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, getDoc } from "firebase/firestore";
+import { userType } from "../Types.ts";
+import { defaultUser } from "../Redux/userSlice.ts";
 
 export const BE_signUp = (
   data: {
@@ -23,8 +25,16 @@ export const BE_signUp = (
     if (password === passwordConfirm) {
       createUserWithEmailAndPassword(auth, email, password)
         .then(({ user }) => {
-          console.log(user);
-          addUserToCollection(user.uid, email, username, "imgLinkPlaceholder");
+          //TODO: crear imagen default de usuario
+
+          const userInfo = addUserToCollection(
+            user.uid,
+            email,
+            username,
+            "imgLinkPlaceholder"
+          );
+
+          //TODO: setear informacion de usuario en firestore y local
           reset();
           routeTo("/dashboard");
         })
@@ -47,7 +57,10 @@ export const BE_signIn = (
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
       .then(({ user }) => {
-        console.log(user);
+        //TODO: actualizar estado online de usuario
+        const userInfo = getUserInfo(user.uid);
+
+        //TODO: setear informacion de usuario en firestore y local
         reset();
         routeTo("/dashboard");
       })
@@ -71,8 +84,28 @@ const addUserToCollection = async (
     img,
     username,
     email,
-    creationTime: serverTimestamp(),
-    lastSeen: serverTimestamp(),
     bio: "La mas reciente araña en unirse a nuestra red.",
   });
+
+  return getUserInfo(id);
+};
+
+const getUserInfo = async (id: string): Promise<userType> => {
+  const userRef = doc(db, "users", id);
+  const user = await getDoc(userRef);
+
+  if (user.exists()) {
+    const { img, isOnline, username, email, bio } = user.data();
+    return {
+      id: user.id,
+      img,
+      isOnline,
+      username,
+      email,
+      bio,
+    };
+  } else {
+    toastErr("Usuario no encontrado");
+    return defaultUser;
+  }
 };
