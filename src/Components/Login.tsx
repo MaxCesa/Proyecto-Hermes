@@ -3,6 +3,9 @@ import Input from "./Input.tsx";
 import "../Assets/main.css";
 import { BE_signIn, BE_signUp } from "../Backend/Queries.ts";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../Redux/store.ts";
+import { authDataType } from "../Types.ts";
 
 const Login = () => {
   const [login, setLogin] = useState(true);
@@ -11,6 +14,7 @@ const Login = () => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [username, setUsername] = useState("");
   const routeTo = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const reset = () => {
     setEmail("");
     setPassword("");
@@ -20,11 +24,16 @@ const Login = () => {
 
   const handleSignup = () => {
     const data = { email, username, password, passwordConfirm };
-    BE_signUp(data, reset, routeTo);
+    auth(data, BE_signUp);
   };
   const handleSignin = () => {
     const data = { email, password };
-    BE_signIn(data, reset, routeTo);
+    auth(data, BE_signIn);
+  };
+
+  //bastante enfermo el any en func, pero paja de typearlo mejor
+  const auth = (data: authDataType, func: any) => {
+    func(data, reset, routeTo, dispatch);
   };
 
   return (

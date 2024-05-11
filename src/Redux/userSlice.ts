@@ -9,13 +9,21 @@ export const defaultUser: userType = {
   email: "",
 };
 
-const initialState = {};
+const initialState = {
+  user: [],
+  curretUser: defaultUser,
+  currentSelectedUser: null,
+};
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action) => {},
+    setUser: (state, action) => {
+      console.log(action);
+      //set loged in user
+      state.curretUser = action.payload;
+    },
     setUsers: (state, action) => {},
   },
 });

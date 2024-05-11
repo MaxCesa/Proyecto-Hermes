@@ -6,9 +6,11 @@ import { auth, db } from "./Firebase.ts";
 import { toastErr } from "../utils/toast.ts";
 import catchErr from "../utils/catchErr.ts";
 import { NavigateFunction } from "react-router-dom";
-import { doc, serverTimestamp, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { userType } from "../Types.ts";
 import { defaultUser } from "../Redux/userSlice.ts";
+import { AppDispatch } from "../Redux/store.ts";
+import { setUser } from "../Redux/userSlice.ts";
 
 export const BE_signUp = (
   data: {
@@ -18,23 +20,24 @@ export const BE_signUp = (
     passwordConfirm: string;
   },
   reset: () => void,
-  routeTo: NavigateFunction
+  routeTo: NavigateFunction,
+  dispatch: AppDispatch
 ) => {
   const { email, username, password, passwordConfirm } = data;
   if (email && password) {
     if (password === passwordConfirm) {
       createUserWithEmailAndPassword(auth, email, password)
-        .then(({ user }) => {
+        .then(async ({ user }) => {
           //TODO: crear imagen default de usuario
 
-          const userInfo = addUserToCollection(
+          const userInfo = await addUserToCollection(
             user.uid,
             email,
             username,
             "imgLinkPlaceholder"
           );
 
-          //TODO: setear informacion de usuario en firestore y local
+          dispatch(setUser(userInfo));
           reset();
           routeTo("/dashboard");
         })
@@ -51,16 +54,16 @@ export const BE_signUp = (
 export const BE_signIn = (
   data: { email: string; password: string },
   reset: () => void,
-  routeTo: NavigateFunction
+  routeTo: NavigateFunction,
+  dispatch: AppDispatch
 ) => {
   const { email, password } = data;
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
-      .then(({ user }) => {
-        //TODO: actualizar estado online de usuario
-        const userInfo = getUserInfo(user.uid);
+      .then(async ({ user }) => {
+        const userInfo = await getUserInfo(user.uid);
 
-        //TODO: setear informacion de usuario en firestore y local
+        dispatch(setUser(userInfo));
         reset();
         routeTo("/dashboard");
       })
