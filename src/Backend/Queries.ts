@@ -11,6 +11,7 @@ import { userType } from "../Types.ts";
 import { defaultUser } from "../Redux/userSlice.ts";
 import { AppDispatch } from "../Redux/store.ts";
 import { setUser } from "../Redux/userSlice.ts";
+import AvatarGenerator from "../utils/avatarGenerator.ts";
 
 export const BE_signUp = (
   data: {
@@ -28,13 +29,13 @@ export const BE_signUp = (
     if (password === passwordConfirm) {
       createUserWithEmailAndPassword(auth, email, password)
         .then(async ({ user }) => {
-          //TODO: crear imagen default de usuario
+          const imgLink = AvatarGenerator(username);
 
           const userInfo = await addUserToCollection(
             user.uid,
             email,
             username,
-            "imgLinkPlaceholder"
+            imgLink
           );
 
           dispatch(setUser(userInfo));
