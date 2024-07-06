@@ -11,7 +11,7 @@ export const defaultUser: userType = {
 
 const initialState = {
   user: [],
-  curretUser: defaultUser,
+  currentUser: defaultUser,
   currentSelectedUser: null,
 };
 
@@ -20,9 +20,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      console.log(action);
-      //set loged in user
-      state.curretUser = action.payload;
+      const user = action.payload;
+      localStorage.setItem("edgerunner", JSON.stringify(user));
+      state.currentUser = action.payload;
     },
     setUsers: (state, action) => {},
   },

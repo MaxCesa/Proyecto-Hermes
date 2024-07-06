@@ -6,7 +6,7 @@ import { auth, db } from "./Firebase.ts";
 import { toastErr } from "../utils/toast.ts";
 import catchErr from "../utils/catchErr.ts";
 import { NavigateFunction } from "react-router-dom";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { userType } from "../Types.ts";
 import { defaultUser } from "../Redux/userSlice.ts";
 import { AppDispatch } from "../Redux/store.ts";
@@ -62,6 +62,8 @@ export const BE_signIn = (
   if (email && password) {
     signInWithEmailAndPassword(auth, email, password)
       .then(async ({ user }) => {
+        await updateUserInfo({ id: user.uid, isOnline: true });
+
         const userInfo = await getUserInfo(user.uid);
 
         dispatch(setUser(userInfo));
@@ -111,5 +113,41 @@ const getUserInfo = async (id: string): Promise<userType> => {
   } else {
     toastErr("Usuario no encontrado");
     return defaultUser;
+  }
+};
+
+const updateUserInfo = async ({
+  id,
+  username,
+  img,
+  isOnline,
+  isOffline,
+}: {
+  id?: string;
+  username?: string;
+  img?: string;
+  isOnline?: boolean;
+  isOffline?: boolean;
+}) => {
+  if (!id) {
+    id = getStorageUser().id;
+  }
+
+  if (id) {
+    await updateDoc(doc(db, "users", id), {
+      ...(username && { username }),
+      ...(isOnline && { isOnline }),
+      ...(isOffline && { isOnline: false }),
+      ...(img && { img }),
+    });
+  }
+};
+
+const getStorageUser = () => {
+  const user = localStorage.getItem("edgerunner");
+  if (user) {
+    return JSON.parse(user);
+  } else {
+    return null;
   }
 };
